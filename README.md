@@ -1,5 +1,3 @@
-Here's a plain text version of the README, which you can easily copy and paste:
-
 ---
 
 # Digital Doll Core (NestJS Project)
