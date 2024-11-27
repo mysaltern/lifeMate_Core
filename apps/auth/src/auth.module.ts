@@ -27,15 +27,15 @@ class EntityLogger implements OnModuleInit {
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        console.log('Entity Path:', __dirname + '/../user/entities/*.entity{.ts,.js}');
+        const dbPassword = String(configService.get<string>('DB_PASSWORD'));
         return {
           type: 'postgres',
-          host: configService.get<string>('DB_HOST', 'localhost'),
-          port: configService.get<number>('DB_PORT', 5432),
-          username: configService.get<string>('DB_USERNAME', 'postgres'),
-          password: configService.get<string>('DB_PASSWORD', '123'),
-          database: configService.get<string>('DB_NAME', 'lifeMateDoll'),
-          entities: [User], // Explicitly import the User entity
+          host: configService.get<string>('DB_HOST'),
+          port: configService.get<number>('DB_PORT'),
+          username: configService.get<string>('DB_USERNAME'),
+          password: dbPassword,
+          database: configService.get<string>('DB_NAME'),
+          entities: [User],
           synchronize: true,
         };
       },
