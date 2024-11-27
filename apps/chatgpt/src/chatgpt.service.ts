@@ -10,7 +10,7 @@ export class ChatgptService {
 
   constructor(
     private readonly httpService: HttpService,
-    private readonly configService: ConfigService, // Inject ConfigService
+    private readonly configService: ConfigService,
   ) {
     this.apiKey = this.configService.get<string>('OPENAI_API_KEY');
     this.apiUrl = this.configService.get<string>('OPENAI_API_URL');
@@ -18,7 +18,7 @@ export class ChatgptService {
 
   async callChatGptApi(text: string): Promise<string> {
     const data = {
-      model: 'gpt-4o', // Replace with a valid model name
+      model: 'gpt-4o-mini',
       messages: [
         { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: text },
