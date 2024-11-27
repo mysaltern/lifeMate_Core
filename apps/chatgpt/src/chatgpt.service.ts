@@ -1,19 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class ChatgptService {
-  constructor(private readonly httpService: HttpService) {}
+  private readonly apiKey: string;
+  private readonly apiUrl: string;
+
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService, // Inject ConfigService
+  ) {
+    this.apiKey = this.configService.get<string>('OPENAI_API_KEY');
+    this.apiUrl = this.configService.get<string>('OPENAI_API_URL');
+  }
 
   async callChatGptApi(text: string): Promise<string> {
-  
-    // console.log(999);
-    const url = 'https://api.openai.com/v1/chat/completions';
-    const apiKey = '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';
-
     const data = {
-      model: 'gpt-4', // Replace with a valid model name
+      model: 'gpt-4o', // Replace with a valid model name
       messages: [
         { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: text },
@@ -23,14 +28,13 @@ export class ChatgptService {
 
     const headers = {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${this.apiKey}`,
     };
 
-    try { 
+    try {
       const response = await lastValueFrom(
-        this.httpService.post(url, data, { headers }),
+        this.httpService.post(this.apiUrl, data, { headers }),
       );
-   
       return response.data.choices[0].message.content;
     } catch (error: any) {
       console.error('Error response data:', error.response?.data);
