@@ -2,11 +2,10 @@ import { Module, Injectable, OnModuleInit } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user/entities/user.entity'; 
-import { JwtModule } from '@nestjs/jwt';
+import { User } from './user/entities/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UserModule } from './user/user.module';
 import { DataSource } from 'typeorm';
+import { UserModule } from './user/user.module';
 
 @Injectable()
 class EntityLogger implements OnModuleInit {
@@ -20,12 +19,9 @@ class EntityLogger implements OnModuleInit {
 
 @Module({
   imports: [
-    // Load environment variables
-    ConfigModule.forRoot(),
-
-    // Configure TypeORM with explicit entity import
+    ConfigModule.forRoot(), // Load environment variables
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
+      imports: [ConfigModule,UserModule],
       useFactory: (configService: ConfigService) => {
         const dbPassword = String(configService.get<string>('DB_PASSWORD'));
         return {
@@ -41,25 +37,9 @@ class EntityLogger implements OnModuleInit {
       },
       inject: [ConfigService],
     }),
-
-    // Register specific entities for this module
     TypeOrmModule.forFeature([User]),
-
-    // JWT Module for Authentication
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '1d' },
-      }),
-      inject: [ConfigService],
-    }),
-
-    // Import the UserModule
-    UserModule,
+  
   ],
-
-  // Register controllers and services
   controllers: [AuthController],
   providers: [AuthService, EntityLogger],
 })

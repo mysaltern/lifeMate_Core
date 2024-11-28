@@ -1,68 +1,71 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from '../user/entities/user.entity'; 
-
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../user/entities/user.entity';
 @Injectable()
 export class UserService {
+
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>, 
+    private usersRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async signUp(email: string, password: string): Promise<{ status: string; message: string }> {
+    const saltOrRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltOrRounds);
+
+    const user = this.usersRepository.create({
+      email,
+      password: hashedPassword,
+    });
+
     try {
-      const newUser = this.usersRepository.create(createUserDto);
-      return await this.usersRepository.save(newUser); 
+      await this.usersRepository.save(user);
+      return {
+        status: 'success',
+        message: 'User successfully registered',
+      };
     } catch (error) {
-      // More specific error handling
-      if (error.code === '23505') { 
+      if (error.code === '23505') {
         // Unique constraint violation (e.g., duplicate email)
-        throw new BadRequestException('Email already exists'); 
-      } else if (error.name === 'QueryFailedError') {
-        // More detailed information from TypeORM
-        if (error.message.includes('duplicate key value violates unique constraint')) {
-          // Extract the column name causing the conflict (e.g., email, username)
-          const columnName = error.detail.match(/Key \((.+)\)=\(/)[1]; 
-          throw new BadRequestException(`${columnName} already exists`);
-        } else {
-          throw new BadRequestException(`Database error: ${error.message}`); 
-        }
-      } else {
-        // For other unexpected errors
-        console.error(error); // Log the full error for debugging
-        throw new BadRequestException('Failed to create user'); 
+        return {
+          status: 'error',
+          message: 'Email is already in use',
+        };
       }
+      throw new Error('Registration failed. Please try again later.');
     }
   }
 
-  async findAll(): Promise<User[]> {
-    return await this.usersRepository.find();
-  }
+  async signIn(email: string, password: string): Promise<{ status: string; message: string; accessToken?: string }> {
+    const user = await this.usersRepository.findOne({ where: { email } });
 
-  async findOne(id: number): Promise<User> {
-    const user = await this.usersRepository.findOne({ where: { id } });
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      return {
+        status: 'error',
+        message: 'Invalid email or password',
+      };
     }
-    return user;
-  }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findOne(id); // Use findOne to check if the user exists
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    // Update the user object with the new data
-    Object.assign(user, updateUserDto);
-
-    return await this.usersRepository.save(user);
-  }
-
-  async remove(id: number): Promise<void> {
-    const result = await this.usersRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+    if (!isPasswordValid) {
+      return {
+        status: 'error',
+        message: 'Invalid email or password',
+      };
     }
+
+    const payload = { email: user.email, sub: user.id };
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    return {
+      status: 'success',
+      message: 'Sign-in successful',
+      accessToken,
+    };
   }
 }
