@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  core:
+    build:
+      context: ./apps/api
+      dockerfile: ./apps/api/dockerfile
+    ports:
+      - "3000:3000" # Map container port to host port
+    environment:
+      - NODE_ENV=production
+
+

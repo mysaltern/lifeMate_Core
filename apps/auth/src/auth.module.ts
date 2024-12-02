@@ -6,6 +6,7 @@ import { User } from './user/entities/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { UserModule } from './user/user.module';
+import * as path from 'path';
 
 @Injectable()
 class EntityLogger implements OnModuleInit {
@@ -19,10 +20,16 @@ class EntityLogger implements OnModuleInit {
 
 @Module({
   imports: [
-    ConfigModule.forRoot(), // Load environment variables
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: path.resolve( './apps/auth/.env'), 
+
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule,UserModule],
       useFactory: (configService: ConfigService) => {
+
+
         const dbPassword = String(configService.get<string>('DB_PASSWORD'));
         return {
           type: 'postgres',

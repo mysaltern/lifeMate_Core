@@ -76,6 +76,18 @@ This project is currently **under development** and forms the backbone of the Di
    npm run start:dev <service-name>
    ```
 
+5. build a docker iamge
+
+  ```bash
+H:\life_mate_back\api\apps\api>docker build :  ../../ -f Dockerfile -t core
+   ```
+
+6. run a image with docker
+
+ ```bash
+docker run -d -p 3000:3000 core
+   ```
+
 ---
 
 ## Dockerization (Planned)
