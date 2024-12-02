@@ -79,7 +79,7 @@ This project is currently **under development** and forms the backbone of the Di
 5. build a docker iamge
 
   ```bash
-H:\life_mate_back\api\apps\api>docker build :  ../../ -f Dockerfile -t core
+H:\life_mate_back\api\apps\api>docker build  ../../ -f Dockerfile -t core
    ```
 
 6. run a image with docker
