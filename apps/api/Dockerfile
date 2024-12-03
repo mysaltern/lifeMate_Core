@@ -1,22 +1,33 @@
-# Base image
-FROM node:18-alpine 
+# Use a smaller base image for building
+FROM node:18-alpine AS builder
 
 # Set working directory
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json
+# Copy package files for dependency installation
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install all dependencies, including development dependencies, for building
+RUN npm ci
 
-# Copy all source files
+# Copy the rest of the source code
 COPY . .
 
 # Build the application
 RUN npm run build
 
 
+# Use a lightweight runtime image for production
+FROM node:18-alpine 
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Copy only built files and production dependencies
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+
+# Expose application port
 EXPOSE 3000
 
 # Start the application
