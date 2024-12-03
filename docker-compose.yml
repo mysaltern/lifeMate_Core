@@ -1,12 +1,13 @@
-version: "3.8"
 services:
   core:
     build:
-      context: ./apps/api
-      dockerfile: ./apps/api/dockerfile
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+      target: Development
+    command: npm run start:dev api
     ports:
       - "3000:3000" # Map container port to host port
-    environment:
-      - NODE_ENV=production
+    volumes:
+      - .:/usr/src/app
 
 
