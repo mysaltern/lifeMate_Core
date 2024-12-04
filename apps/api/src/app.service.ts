@@ -39,7 +39,7 @@ export class ApiGatewayService {
   // Call OpenAI Service
   private async callOpenAiService(text: string): Promise<string> {
     const response = await lastValueFrom(
-      this.httpService.post('http://localhost:3001/chatgpt/process', { text }),
+      this.httpService.post('http://chatgpt:3001/chatgpt/process', { text }),
     );
     return response.data;
   }

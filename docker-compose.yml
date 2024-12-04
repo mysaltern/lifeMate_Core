@@ -1,13 +1,73 @@
 services:
-  core:
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: Development
+    command: npm run start:dev -- auth
+    ports:
+      - "3002:3002"
+    volumes:
+      - .:/usr/src/app
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: 123
+      DB_NAME: lifeMateDoll
+    container_name: auth  # Set custom container name
+
+  api:
     build:
       context: .
       dockerfile: ./apps/api/Dockerfile
       target: Development
-    command: npm run start:dev api
+    command: npm run start:dev -- api
     ports:
-      - "3000:3000" # Map container port to host port
+      - "3000:3000"
+    networks:
+      - default
     volumes:
       - .:/usr/src/app
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: 123
+      DB_NAME: lifeMateDoll
+    container_name: api  # Set custom container name
 
+  chatgpt:
+    build:
+      context: .
+      dockerfile: ./apps/chatgpt/Dockerfile
+      target: Development
+    command: npm run start:dev -- chatgpt
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - default
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: 123
+      DB_NAME: lifeMateDoll
+    container_name: chatgpt  # Set custom container name
 
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    ports:
+      - "5433:5432" # Expose database port
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: lifeMateDoll
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
