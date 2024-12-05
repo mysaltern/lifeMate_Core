@@ -6,7 +6,8 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [HttpModule,   ConfigModule.forRoot({
-    isGlobal: true, // Makes ConfigModule available globally
+    envFilePath: '/usr/src/app/.env',
+    isGlobal: true, 
   }),]
   ,
   controllers: [ChatgptController],
