@@ -2,27 +2,33 @@
 FROM node:18-alpine AS builder
 
 WORKDIR /usr/src/app
-COPY ../../package*.json ./
-# Install necessary build tools
+
+# Install necessary build tools for bcrypt and other native modules
 RUN apk add --no-cache make g++ python3
 
-# Install all dependencies
-COPY package*.json ./
-RUN npm ci
+# Copy package.json and package-lock.json for dependency installation
+COPY ../../package*.json ./
 
-# Copy source and build
+# Install all dependencies
+RUN npm install
+
+# Rebuild bcrypt for the target architecture
+RUN npm rebuild bcrypt --build-from-source
+
+# Copy the rest of the source code and build the application
 COPY . .
 RUN npm run build
 
-# Production Stage
+# Development Stage
 FROM node:18-alpine AS Development
 
 WORKDIR /usr/src/app
 
-# Copy built app and dependencies
+# Copy built application and dependencies
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 
-EXPOSE 3000
+EXPOSE 3002
 
+# Start the application
 CMD ["node", "dist/apps/auth/main.js"]

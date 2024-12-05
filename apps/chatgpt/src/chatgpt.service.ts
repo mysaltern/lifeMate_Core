@@ -14,7 +14,6 @@ export class ChatgptService {
   ) {
     this.apiKey = this.configService.get<string>('OPENAI_API_KEY');
     this.apiUrl = this.configService.get<string>('OPENAI_API_URL');
-    console.log('OPENAI_API_URL:', this.configService.get<string>('OPENAI_API_URL'));
   }
 
   async callChatGptApi(text: string): Promise<string> {

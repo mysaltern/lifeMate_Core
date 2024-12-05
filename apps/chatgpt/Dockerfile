@@ -28,7 +28,7 @@ COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 
 # Expose application port
-EXPOSE 3000
+EXPOSE 3001
 
 # Start the application
 CMD ["node", "dist/apps/chatgpt/main.js"]

@@ -9,13 +9,16 @@ services:
       - "3002:3002"
     volumes:
       - .:/usr/src/app
+      - /usr/src/app/node_modules  # Prevent host node_modules from overriding
+    networks:
+      - default
     environment:
       DB_HOST: db
       DB_PORT: 5432
       DB_USERNAME: postgres
       DB_PASSWORD: 123
       DB_NAME: lifeMateDoll
-    container_name: auth 
+    container_name: auth
 
   api:
     build:
@@ -29,6 +32,7 @@ services:
       - default
     volumes:
       - .:/usr/src/app
+      - ./apps/chatgpt/.env:/usr/src/app/.env 
     environment:
       DB_HOST: db
       DB_PORT: 5432
