@@ -3,64 +3,38 @@ services:
     build:
       context: .
       dockerfile: ./apps/auth/Dockerfile
-      target: Development
+      target: development
     command: npm run start:dev -- auth
     ports:
       - "3002:3002"
     volumes:
       - .:/usr/src/app
-      - /usr/src/app/node_modules  # Prevent host node_modules from overriding
-    networks:
-      - default
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USERNAME: postgres
-      DB_PASSWORD: 123
-      DB_NAME: lifeMateDoll
+      - /usr/src/app/node_modules
     container_name: auth
 
   api:
     build:
       context: .
       dockerfile: ./apps/api/Dockerfile
-      target: Development
+      target: development
     command: npm run start:dev -- api
     ports:
       - "3000:3000"
-    networks:
-      - default
     volumes:
       - .:/usr/src/app
-      - ./apps/chatgpt/.env:/usr/src/app/.env 
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USERNAME: postgres
-      DB_PASSWORD: 123
-      DB_NAME: lifeMateDoll
-    container_name: api  
+      - ./apps/chatgpt/.env:/usr/src/app/.env
 
   chatgpt:
     build:
       context: .
       dockerfile: ./apps/chatgpt/Dockerfile
-      target: Development
+      target: development
     command: npm run start:dev -- chatgpt
     ports:
       - "3001:3001"
     volumes:
       - .:/usr/src/app
-      - ./apps/chatgpt/.env:/usr/src/app/.env 
-    networks:
-      - default
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USERNAME: postgres
-      DB_PASSWORD: 123
-      DB_NAME: lifeMateDoll
-    container_name: chatgpt 
+      - ./apps/chatgpt/.env:/usr/src/app/.env
   db:
     image: postgres:15
     container_name: postgres_db

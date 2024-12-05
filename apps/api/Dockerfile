@@ -3,7 +3,7 @@ FROM node:18-alpine AS builder
 
 # Set working directory
 WORKDIR /usr/src/app
-
+COPY ../../package*.json ./
 # Copy package files for dependency installation
 COPY package*.json ./
 
@@ -18,7 +18,7 @@ RUN npm run build
 
 
 # Use a lightweight runtime image for production
-FROM node:18-alpine  AS Development
+FROM node:18-alpine  AS development
 
 # Set working directory
 WORKDIR /usr/src/app

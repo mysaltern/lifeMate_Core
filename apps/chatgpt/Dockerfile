@@ -18,7 +18,7 @@ RUN npm run build
 
 
 # Use a lightweight runtime image for production
-FROM node:18-alpine  AS Development
+FROM node:18-alpine  AS development
 
 # Set working directory
 WORKDIR /usr/src/app
