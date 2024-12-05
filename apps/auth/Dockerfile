@@ -20,7 +20,7 @@ COPY . .
 RUN npm run build
 
 # Development Stage
-FROM node:18-alpine AS Development
+FROM node:18-alpine AS development
 
 WORKDIR /usr/src/app
 
