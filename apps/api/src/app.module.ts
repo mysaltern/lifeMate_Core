@@ -8,8 +8,8 @@ import { ApiGatewayService } from './app.service';
   imports: [
     HttpModule,
     ConfigModule.forRoot({
-      isGlobal: true, // Make the ConfigModule globally available in this service
-      envFilePath: '.env', // Specify the .env file for this service
+      isGlobal: true,
+      envFilePath: './apps/api/.env',
     }),
   ],
   controllers: [AppController],
