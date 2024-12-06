@@ -31,6 +31,7 @@ class EntityLogger implements OnModuleInit {
           username: configService.get<string>('DB_USERNAME'),
           password: dbPassword,
           database: configService.get<string>('DB_NAME'),
+          entities:[__dirname+'/**/*.entity{.ts,.js}'],
           autoLoadEntities: true, // Automatically load entities registered with TypeOrmModule.forFeature
           synchronize: true,
         };
