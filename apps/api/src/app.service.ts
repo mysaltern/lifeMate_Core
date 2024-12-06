@@ -7,10 +7,10 @@ export class ApiGatewayService {
   constructor(private readonly httpService: HttpService) {}
 
   // Main function to decide and process the text
-  async processText(text: string): Promise<string> {
+  async processText(text: string,userID: number): Promise<string> {
     // Decision logic to determine the best AI
     const bestAiService = this.selectBestAi(text);
-
+    const loadHistory = this.loadHistory(userID);
     // Call the appropriate AI service
     switch (bestAiService) {
       case 'chatgpt':
@@ -24,6 +24,11 @@ export class ApiGatewayService {
     }
   }
 
+
+  private loadHistory(userID:number)
+  {
+    return ['its history',' last one'];
+  }
   // Decision logic
   private selectBestAi(text: string): string {
     // Example logic: Choose AI based on text length
@@ -38,6 +43,7 @@ export class ApiGatewayService {
 
   // Call OpenAI Service
   private async callOpenAiService(text: string): Promise<string> {
+    // history = null ;
     const response = await lastValueFrom(
       // this.httpService.post('http://chatgpt:3001/chatgpt/process', { text }),
       this.httpService.post('http://localhost:3001/chatgpt/process', { text }),
