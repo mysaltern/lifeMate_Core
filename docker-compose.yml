@@ -24,6 +24,18 @@ services:
       - .:/usr/src/app
       - ./apps/chatgpt/.env:/usr/src/app/.env
 
+  tts:
+    build:
+      context: .
+      dockerfile: ./apps/tts/Dockerfile
+      target: development
+    command: npm run start:dev -- tts
+    ports:
+      - "3003:3003"
+    volumes:
+      - .:/usr/src/app
+      - ./apps/chatgpt/.env:/usr/src/app/.env
+
   chatgpt:
     build:
       context: .
