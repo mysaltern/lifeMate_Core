@@ -3,9 +3,9 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../user/entities/user.entity';
-import { Conversation } from '../user/entities/conversation.entity';
-import { ImportanceLevel } from '../user/entities/importanceLevel.entity';
+import { User } from '@app/common/entities/user.entity';
+import { Conversation } from '@app/common/entities/conversation.entity';
+import { ImportanceLevel } from '@app/common/entities/importanceLevel.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({

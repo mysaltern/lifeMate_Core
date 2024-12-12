@@ -23,7 +23,7 @@ export class ChatgptService {
         { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: text },
       ],
-      max_tokens: 150,
+      max_tokens: 1,
     };
 
     const headers = {

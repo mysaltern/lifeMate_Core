@@ -1,16 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
-
+import { ConversationService } from './conversation/conversation.service'; 
+import { CreateConversationDto } from './conversation/dto/create-conversation.dto';
 @Injectable()
 export class ApiGatewayService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly conversationService: ConversationService,
+  ) {}
 
   // Main function to decide and process the text
   async processText(text: string,userID: number): Promise<string> {
     // Decision logic to determine the best AI
     const bestAiService = this.selectBestAi(text);
     const loadHistory = this.loadHistory(userID);
+    const createConversationDto: CreateConversationDto = {
+      text,
+      date: new Date().toISOString(),
+      userId: userID, 
+      importanceLevelId: '1',
+    };
+    const newConversation = await this.conversationService.createConversation(createConversationDto);
+    console.log('New conversation created:', newConversation);
     // Call the appropriate AI service
     switch (bestAiService) {
       case 'chatgpt':
