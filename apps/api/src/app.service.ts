@@ -57,10 +57,17 @@ export class ApiGatewayService {
   private async callOpenAiService(text: string): Promise<string> {
     // history = null ;
     const response = await lastValueFrom(
-      // this.httpService.post('http://chatgpt:3001/chatgpt/process', { text }),
-      this.httpService.post('http://localhost:3001/chatgpt/process', { text }),
+      this.httpService.post<{ text: string | number }>('http://localhost:3001/chatgpt/process', { text })
     );
-    return response.data;
+
+    const voice = await lastValueFrom(
+      this.httpService.post('http://localhost:3003/tts/process', { 
+        text: response.data
+      })
+    );
+    
+    return voice.data;
+    
   }
 
   // Call LLaMA Service
