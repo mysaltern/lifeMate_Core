@@ -45,6 +45,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/common/tsconfig.lib.json"
       }
+    },
+    "tts": {
+      "type": "application",
+      "root": "apps/tts",
+      "entryFile": "main",
+      "sourceRoot": "apps/tts/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/tts/tsconfig.app.json"
+      }
     }
   }
 }
