@@ -1,7 +1,3 @@
-You can add the section about setting `NODE_ENV` before starting the application right after the **Installation** or **Prerequisites** section, where it fits most naturally. Here's an updated version of your README with that section included:
-
----
-
 # Digital Doll Core (NestJS Project)
 
 This repository serves as the core backend for a **Digital Doll** platform, built using the **NestJS** framework. The project is designed to operate as a **microservice-based architecture**, providing modularity, scalability, and flexibility for future enhancements.
