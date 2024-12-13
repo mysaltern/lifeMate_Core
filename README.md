@@ -1,3 +1,5 @@
+You can add the section about setting `NODE_ENV` before starting the application right after the **Installation** or **Prerequisites** section, where it fits most naturally. Here's an updated version of your README with that section included:
+
 ---
 
 # Digital Doll Core (NestJS Project)
@@ -91,6 +93,30 @@ This project is currently **under development** and forms the backbone of the Di
 
 ---
 
+## Setting `NODE_ENV`
+
+Before starting your application, ensure `NODE_ENV` is set manually in the terminal based on the environment:
+
+### Linux/Mac:
+```bash
+export NODE_ENV=development
+npm run start
+```
+
+### Windows (Command Prompt):
+```cmd
+set NODE_ENV=development
+npm run start
+```
+
+### Windows (PowerShell):
+```powershell
+$env:NODE_ENV="development"
+npm run start
+```
+
+---
+
 ## Dockerized Architecture
 
 The project has been fully Dockerized for seamless setup and operation. Below are the key components defined in the `docker-compose.yml` file:
@@ -146,3 +172,4 @@ This README will evolve as the project matures. Stay tuned for updates! 🚀
 
 ---
 
+This update provides clear instructions on how to set `NODE_ENV` for different environments and operating systems. It's now ready for developers to follow when starting the application locally!
