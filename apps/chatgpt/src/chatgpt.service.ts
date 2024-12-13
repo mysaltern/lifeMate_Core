@@ -25,7 +25,6 @@ export class ChatgptService {
       ],
       max_tokens: 1,
     };
-
     const headers = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this.apiKey}`,

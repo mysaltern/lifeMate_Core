@@ -3,11 +3,13 @@ import { ChatgptController } from './chatgpt.controller';
 import { ChatgptService } from './chatgpt.service';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
-
+import { join } from 'path';
 @Module({
   imports: [HttpModule,   ConfigModule.forRoot({
-    // envFilePath: '/usr/src/app/.env',
-    envFilePath: './apps/chatgpt/.env',
+    envFilePath: [
+      join( '@app/common/.env.' + (process.env.NODE_ENV || 'development')), 
+      join( './apps/chatgpt/.env.' + (process.env.NODE_ENV || 'development')),   
+    ],
     isGlobal: true, 
   }),]
   ,

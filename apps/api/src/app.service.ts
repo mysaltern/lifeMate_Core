@@ -26,7 +26,7 @@ export class ApiGatewayService {
     // Call the appropriate AI service
     switch (bestAiService) {
       case 'chatgpt':
-        return await this.callOpenAiService(text);
+        return await this.callOpenAiService(text,userID);
       case 'llama':
         return await this.callLlamaService(text);
       case 'huggingface':
@@ -54,7 +54,7 @@ export class ApiGatewayService {
   }
 
   // Call OpenAI Service
-  private async callOpenAiService(text: string): Promise<string> {
+  private async callOpenAiService(text: string,userID:number): Promise<string> {
     // history = null ;
     const response = await lastValueFrom(
       this.httpService.post<{ text: string | number }>('http://localhost:3001/chatgpt/process', { text })
@@ -62,7 +62,8 @@ export class ApiGatewayService {
 
     const voice = await lastValueFrom(
       this.httpService.post('http://localhost:3003/tts/process', { 
-        text: response.data
+        text: response.data,
+        userID:userID
       })
     );
     

@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import * as path from 'path';
-
+import { join } from 'path';
 @Injectable()
 class EntityLogger implements OnModuleInit {
   constructor(private readonly dataSource: DataSource) {}
@@ -18,7 +18,10 @@ class EntityLogger implements OnModuleInit {
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: path.resolve('./apps/auth/.env'),
+      envFilePath: [
+        join( '@app/common/.env.' + (process.env.NODE_ENV || 'development')), 
+        join( './apps/auth/.env.' + (process.env.NODE_ENV || 'development')),   
+      ],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
