@@ -11,6 +11,8 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     container_name: auth
+    environment:
+      NODE_ENV: development 
 
   api:
     build:
@@ -23,6 +25,9 @@ services:
     volumes:
       - .:/usr/src/app
       - ./apps/chatgpt/.env:/usr/src/app/.env
+    container_name: core
+    environment:
+      NODE_ENV: development 
 
   tts:
     build:
@@ -35,6 +40,9 @@ services:
     volumes:
       - .:/usr/src/app
       - ./apps/chatgpt/.env:/usr/src/app/.env
+    container_name: tts
+    environment:
+      NODE_ENV: development 
 
   chatgpt:
     build:
@@ -47,6 +55,7 @@ services:
     volumes:
       - .:/usr/src/app
       - ./apps/chatgpt/.env:/usr/src/app/.env
+    container_name: chatgpt
   db:
     image: postgres:15
     container_name: postgres_db
