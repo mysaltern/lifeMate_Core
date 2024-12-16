@@ -1,10 +1,10 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
-
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(private readonly httpService: HttpService,private configService: ConfigService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -17,9 +17,8 @@ export class AuthGuard implements CanActivate {
     const token = authHeader.split(' ')[1];
 
     try {
-
-      // Call the auth service to validate the token
-      const authServiceUrl = 'http://localhost:3002/auth/validate-token'; // Replace with your auth service URL
+      const AUTH_URL = this.configService.get<string>('AUTH_URL');
+      const authServiceUrl = `${AUTH_URL}/auth/validate-token`;
       const response = await lastValueFrom(
         this.httpService.post(authServiceUrl, { token })
       );
