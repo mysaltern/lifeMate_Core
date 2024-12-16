@@ -1,3 +1,4 @@
+version: '3.9'
 services:
   auth:
     build:
@@ -12,7 +13,8 @@ services:
       - /usr/src/app/node_modules
     container_name: auth
     environment:
-      NODE_ENV: development 
+      NODE_ENV: ${NODE_ENV:-development}
+      CONFIG_ENV_FILE: ./apps/auth/.env.${NODE_ENV:-development}
 
   api:
     build:
@@ -24,10 +26,11 @@ services:
       - "3000:3000"
     volumes:
       - .:/usr/src/app
-      - ./apps/chatgpt/.env:/usr/src/app/.env
+      - /usr/src/app/node_modules
     container_name: core
     environment:
-      NODE_ENV: development 
+      NODE_ENV: ${NODE_ENV:-development}
+      CONFIG_ENV_FILE: ./apps/api/.env.${NODE_ENV:-development}
 
   tts:
     build:
@@ -39,10 +42,11 @@ services:
       - "3003:3003"
     volumes:
       - .:/usr/src/app
-      - ./apps/chatgpt/.env:/usr/src/app/.env
+      - /usr/src/app/node_modules
     container_name: tts
     environment:
-      NODE_ENV: development 
+      NODE_ENV: ${NODE_ENV:-development}
+      CONFIG_ENV_FILE: ./apps/tts/.env.${NODE_ENV:-development}
 
   chatgpt:
     build:
@@ -54,13 +58,17 @@ services:
       - "3001:3001"
     volumes:
       - .:/usr/src/app
-      - ./apps/chatgpt/.env:/usr/src/app/.env
+      - /usr/src/app/node_modules
     container_name: chatgpt
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      CONFIG_ENV_FILE: ./apps/chatgpt/.env.${NODE_ENV:-development}
+
   db:
     image: postgres:15
     container_name: postgres_db
     ports:
-      - "5433:5432" 
+      - "5433:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
