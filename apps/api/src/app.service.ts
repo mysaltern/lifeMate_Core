@@ -3,11 +3,14 @@ import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { ConversationService } from './conversation/conversation.service'; 
 import { CreateConversationDto } from './conversation/dto/create-conversation.dto';
+import { ConfigService } from '@nestjs/config';
+ 
 @Injectable()
 export class ApiGatewayService {
   constructor(
     private readonly httpService: HttpService,
     private readonly conversationService: ConversationService,
+    private configService: ConfigService
   ) {}
 
   // Main function to decide and process the text
@@ -21,8 +24,10 @@ export class ApiGatewayService {
       userId: userID, 
       importanceLevelId: '1',
     };
+ 
     const newConversation = await this.conversationService.createConversation(createConversationDto);
     console.log('New conversation created:', newConversation);
+    console.log(99999);
     // Call the appropriate AI service
     switch (bestAiService) {
       case 'chatgpt':
@@ -56,17 +61,22 @@ export class ApiGatewayService {
   // Call OpenAI Service
   private async callOpenAiService(text: string,userID:number): Promise<string> {
     // history = null ;
-    const response = await lastValueFrom(
-      this.httpService.post<{ text: string | number }>('http://localhost:3001/chatgpt/process', { text })
-    );
+    console.log('miladdddd');
+    const CHATGPT_URL = this.configService.get<string>('CHATGPT_URL');
 
+    const response = await lastValueFrom(
+      this.httpService.post<{ text: string | number }>(`${CHATGPT_URL}/chatgpt/process`, { text })
+
+    );
+ 
+    const TTS_URL = this.configService.get<string>('TTS_URL');
     const voice = await lastValueFrom(
-      this.httpService.post('http://localhost:3003/tts/process', { 
+      this.httpService.post(`${TTS_URL}/tts/process`, { 
         text: response.data,
         userID:userID
       })
     );
-    
+
     return voice.data;
     
   }

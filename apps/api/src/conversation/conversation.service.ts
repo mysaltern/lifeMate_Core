@@ -21,7 +21,7 @@ export class ConversationService {
 
   async createConversation(createConversationDto: CreateConversationDto): Promise<Conversation> {
     const { userId, importanceLevelId, text, date } = createConversationDto;
-  
+
    
     const numericUserId = Number(userId);
     if (isNaN(numericUserId)) {
@@ -32,22 +32,32 @@ export class ConversationService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-  
+   
     const numericImportanceLevelId = Number(importanceLevelId);
+ 
     const importanceLevel = await this.importanceLevelRepository.findOneBy({
       id: numericImportanceLevelId,
     });
     if (!importanceLevel) {
-      throw new NotFoundException('Importance level not found');
+      const levels = ['low', 'medium', 'high'];
+
+      for (const level of levels) {
+        const existingLevel = await this.importanceLevelRepository.findOneBy({
+          name: level,
+        });
+        if (!existingLevel) {
+          const newLevel = this.importanceLevelRepository.create({ name: level });
+          await this.importanceLevelRepository.save(newLevel);
+        }
+      }
     }
-  
     const conversation = this.conversationRepository.create({
       text,
       date,
       user,
       importanceLevel,
     });
-  
+
     return this.conversationRepository.save(conversation);
   }
 }

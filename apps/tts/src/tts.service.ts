@@ -26,13 +26,14 @@ export class TtsService {
   async makeSound(inputText: string,userID: number): Promise<string> {
     try {
       const timestamp = Date.now();
-      const fileName = `./sounds/${userID}_${timestamp}.mp3`; 
+      const fileName = `./sounds/${userID}_${timestamp}.mp3`;
       const _output = path.resolve(fileName); 
+      const inputString = String(inputText); // Explicitly convert to string
 
       const mp3 = await this.openai.audio.speech.create({
         model: 'tts-1',
         voice: 'onyx',
-        input: inputText,
+        input: inputString, // Use the converted string here
       });
 
       if (fs.existsSync(_output)) {
