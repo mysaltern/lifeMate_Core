@@ -76,7 +76,6 @@ export class ApiGatewayService {
         userID:userID
       })
     );
-
     return voice.data;
     
   }
