@@ -13,10 +13,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     TypeOrmModule.forFeature([User, Conversation, ImportanceLevel]),
     JwtModule.registerAsync({
       imports: [ConfigModule], // Import ConfigModule for dynamic configuration
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'), // Load secret from .env
-        signOptions: { expiresIn: '1h' },
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const secret = configService.get<string>('JWT_SECRET'); // Load secret from .env
+        console.log(`JWT Secret: ${secret}`); // Log the secret
+        return {
+          secret, // Use the secret
+          signOptions: { expiresIn: '1h' },
+        };
+      },
       inject: [ConfigService], // Inject ConfigService
     }),
   ],
