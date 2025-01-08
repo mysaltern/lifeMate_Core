@@ -1,0 +1,38 @@
+name: Deploy to ECS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout your code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Log in to Amazon ECR
+      - name: Log in to Amazon ECR
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.us-east-1.amazonaws.com
+
+      # Build and push Docker image
+      - name: Build and push Docker image
+        run: |
+          docker build -t <repository-name>:latest .
+          docker tag <repository-name>:latest <account-id>.dkr.ecr.us-east-1.amazonaws.com/<repository-name>:latest
+          docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/<repository-name>:latest
+
+      # Update ECS service
+      - name: Update ECS service
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws ecs update-service --cluster my-app-cluster --service api --force-new-deployment
