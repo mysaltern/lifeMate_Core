@@ -6,5 +6,5 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(3002);
 }
-console.log("CICD worked for auth");
+console.log("CICD worked for auth 2");
 bootstrap();   
