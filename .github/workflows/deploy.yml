@@ -23,38 +23,56 @@ jobs:
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 730335666258.dkr.ecr.us-east-1.amazonaws.com
 
-      # Build and push Docker image for api-api
-      - name: Build and push Docker image for api-api
+      # Build and push Docker image for api
+      - name: Build and push Docker image for api
         env:
           AWS_DEFAULT_REGION: us-east-1
         run: |
-          docker build -t api-api:latest -f apps/api/Dockerfile .
-          docker tag api-api:latest 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-api:latest
-          docker push 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-api:latest
+          IMAGE_TAG=$(date +%Y%m%d%H%M%S)
+          docker build -t api-api:${IMAGE_TAG} -f apps/api/Dockerfile .
+          docker tag api-api:${IMAGE_TAG} 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-api:${IMAGE_TAG}
+          docker push 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-api:${IMAGE_TAG}
+          echo "API_IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
 
-      # Build and push Docker image for api-auth
-      - name: Build and push Docker image for api-auth
+      # Verify API image contents
+      - name: Verify API image contents
+        run: |
+          docker run -it --rm 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-api:${{ env.API_IMAGE_TAG }} sh -c "ls /usr/src/app/dist/apps"
+
+      # Build and push Docker image for auth
+      - name: Build and push Docker image for auth
         env:
           AWS_DEFAULT_REGION: us-east-1
         run: |
-          docker build -t api-auth:latest -f apps/auth/Dockerfile .
-          docker tag api-auth:latest 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:latest
-          docker push 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:latest
+          IMAGE_TAG=$(date +%Y%m%d%H%M%S)
+          docker build -t api-auth:${IMAGE_TAG} -f apps/auth/Dockerfile .
+          docker tag api-auth:${IMAGE_TAG} 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:${IMAGE_TAG}
+          docker push 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:${IMAGE_TAG}
+          echo "AUTH_IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
 
-      # Update ECS service for api-api
-      - name: Update ECS service for api-api
+      # Verify Auth image contents
+      - name: Verify Auth image contents
+        run: |
+          docker run -it --rm 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:${{ env.AUTH_IMAGE_TAG }} sh -c "ls /usr/src/app/dist/apps"
+
+      # Update ECS service for api
+      - name: Update ECS service for api
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
         run: |
-          aws ecs update-service --cluster my-app-cluster --service api --force-new-deployment
+          aws ecs update-service --cluster my-app-cluster --service api --force-new-deployment \
+            --output json \
+            --query 'service.deployments[0].taskDefinition'
 
-      # Update ECS service for api-auth
-      - name: Update ECS service for api-auth
+      # Update ECS service for auth
+      - name: Update ECS service for auth
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
         run: |
-          aws ecs update-service --cluster my-app-cluster --service auth --force-new-deployment
+          aws ecs update-service --cluster my-app-cluster --service auth --force-new-deployment \
+            --output json \
+            --query 'service.deployments[0].taskDefinition'
