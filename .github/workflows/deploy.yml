@@ -37,7 +37,7 @@ jobs:
       # Verify API image contents
       - name: Verify API image contents
         run: |
-          docker run -it --rm 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-api:${{ env.API_IMAGE_TAG }} sh -c "ls /usr/src/app/dist/apps"
+          docker run -t --rm 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-api:${{ env.API_IMAGE_TAG }} sh -c "ls /usr/src/app/dist/apps"
 
       # Build and push Docker image for auth
       - name: Build and push Docker image for auth
@@ -53,7 +53,7 @@ jobs:
       # Verify Auth image contents
       - name: Verify Auth image contents
         run: |
-          docker run -it --rm 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:${{ env.AUTH_IMAGE_TAG }} sh -c "ls /usr/src/app/dist/apps"
+          docker run -t --rm 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:${{ env.AUTH_IMAGE_TAG }} sh -c "ls /usr/src/app/dist/apps"
 
       # Update ECS service for api
       - name: Update ECS service for api
@@ -62,9 +62,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
         run: |
-          aws ecs update-service --cluster my-app-cluster --service api --force-new-deployment \
-            --output json \
-            --query 'service.deployments[0].taskDefinition'
+          aws ecs update-service --cluster my-app-cluster --service api --force-new-deployment
 
       # Update ECS service for auth
       - name: Update ECS service for auth
@@ -73,6 +71,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
         run: |
-          aws ecs update-service --cluster my-app-cluster --service auth --force-new-deployment \
-            --output json \
-            --query 'service.deployments[0].taskDefinition'
+          aws ecs update-service --cluster my-app-cluster --service auth --force-new-deployment
