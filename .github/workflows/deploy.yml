@@ -45,7 +45,7 @@ jobs:
           AWS_DEFAULT_REGION: us-east-1
         run: |
           IMAGE_TAG=$(date +%Y%m%d%H%M%S)
-          docker build -t api-auth:${IMAGE_TAG} -f apps/auth/Dockerfile .
+          docker build -t api-auth:${IMAGE_TAG} -f apps/auth/Dockerfile --build-arg CONTEXT=apps/auth .
           docker tag api-auth:${IMAGE_TAG} 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:${IMAGE_TAG}
           docker push 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:${IMAGE_TAG}
           echo "AUTH_IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
