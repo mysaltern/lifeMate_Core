@@ -23,8 +23,8 @@ jobs:
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 730335666258.dkr.ecr.us-east-1.amazonaws.com
 
-      # Build and push Docker image
-      - name: Build and push Docker image
+      # Build and push Docker image for api-api
+      - name: Build and push Docker image for api-api
         env:
           AWS_DEFAULT_REGION: us-east-1
         run: |
@@ -32,11 +32,29 @@ jobs:
           docker tag api-api:latest 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-api:latest
           docker push 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-api:latest
 
-      # Update ECS service
-      - name: Update ECS service
+      # Update ECS service for api-api
+      - name: Update ECS service for api-api
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
         run: |
           aws ecs update-service --cluster my-app-cluster --service api --force-new-deployment
+
+      # Build and push Docker image for api-auth
+      - name: Build and push Docker image for api-auth
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          docker build -t api-auth:latest -f apps/auth/Dockerfile .
+          docker tag api-auth:latest 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:latest
+          docker push 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:latest
+
+      # Update ECS service for api-auth
+      - name: Update ECS service for api-auth
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          aws ecs update-service --cluster my-app-cluster --service auth --force-new-deployment
