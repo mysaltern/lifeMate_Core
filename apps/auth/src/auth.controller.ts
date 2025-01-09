@@ -15,11 +15,16 @@ export class AuthController {
     try {
       const secret = this.configService.get<string>('JWT_SECRET');
       console.log(secret);
-      
+
       console.log('miladAuth');
       const decoded = jwt.verify(token, secret);
       return { valid: true, decoded };
     } catch (error) {
+      const secret = this.configService.get<string>('JWT_SECRET');
+      console.log(secret);
+      
+      console.log('miladAuth');
+      const decoded = jwt.verify(token, secret);
       throw new HttpException('Invalid or expired token', HttpStatus.UNAUTHORIZED);
     }
   }
