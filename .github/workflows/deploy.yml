@@ -85,6 +85,14 @@ jobs:
           echo $NEW_TASK_DEFINITION > new-auth-task-def.json
           aws ecs register-task-definition --cli-input-json file://new-auth-task-def.json
 
+      # Debug Task Definitions
+      - name: Debug New Task Definitions
+        run: |
+          echo "API Task Definition:"
+          cat new-api-task-def.json
+          echo "AUTH Task Definition:"
+          cat new-auth-task-def.json
+
       # Update ECS Service for api
       - name: Update ECS Service for api
         env:
