@@ -53,8 +53,10 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
         run: |
-          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition api | jq '.taskDefinition | del(.status, .taskDefinitionArn, .revision, .requiresAttributes, .registeredAt, .deregisteredAt)')
-          NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | jq --arg IMAGE_TAG "730335666258.dkr.ecr.us-east-1.amazonaws.com/api-api:${{ env.API_IMAGE_TAG }}" '.containerDefinitions[0].image = $IMAGE_TAG')
+          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition api | \
+          jq '.taskDefinition | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .deregisteredAt)')
+          NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | \
+          jq --arg IMAGE_TAG "730335666258.dkr.ecr.us-east-1.amazonaws.com/api-api:${{ env.API_IMAGE_TAG }}" '.containerDefinitions[0].image = $IMAGE_TAG')
           echo $NEW_TASK_DEFINITION > new-api-task-def.json
           aws ecs register-task-definition --cli-input-json file://new-api-task-def.json
 
@@ -66,10 +68,13 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
         run: |
-          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition auth | jq '.taskDefinition | del(.status, .taskDefinitionArn, .revision, .requiresAttributes, .registeredAt, .deregisteredAt)')
-          NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | jq --arg IMAGE_TAG "730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:${{ env.AUTH_IMAGE_TAG }}" '.containerDefinitions[0].image = $IMAGE_TAG')
+          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition auth | \
+          jq '.taskDefinition | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy, .deregisteredAt)')
+          NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | \
+          jq --arg IMAGE_TAG "730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:${{ env.AUTH_IMAGE_TAG }}" '.containerDefinitions[0].image = $IMAGE_TAG')
           echo $NEW_TASK_DEFINITION > new-auth-task-def.json
           aws ecs register-task-definition --cli-input-json file://new-auth-task-def.json
+
 
       # Update ECS Service for api
       - name: Update ECS Service for api
