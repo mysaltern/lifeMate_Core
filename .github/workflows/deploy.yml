@@ -34,41 +34,59 @@ jobs:
           docker push 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-api:${IMAGE_TAG}
           echo "API_IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
 
-      # Verify API image contents
-      - name: Verify API image contents
-        run: |
-          docker run -t --rm 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-api:${{ env.API_IMAGE_TAG }} sh -c "ls /usr/src/app/dist/apps"
-
       # Build and push Docker image for auth
       - name: Build and push Docker image for auth
         env:
           AWS_DEFAULT_REGION: us-east-1
         run: |
           IMAGE_TAG=$(date +%Y%m%d%H%M%S)
-          docker build -t api-auth:${IMAGE_TAG} -f ./apps/auth/Dockerfile .
+          docker build -t api-auth:${IMAGE_TAG} -f apps/auth/Dockerfile .
           docker tag api-auth:${IMAGE_TAG} 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:${IMAGE_TAG}
           docker push 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:${IMAGE_TAG}
           echo "AUTH_IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
 
-      # Verify Auth image contents
-      - name: Verify Auth image contents
-        run: |
-          docker run -t --rm 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:${{ env.AUTH_IMAGE_TAG }} sh -c "ls /usr/src/app/dist/apps"
-
-      # Update ECS service for api
-      - name: Update ECS service for api
+      # Update ECS Task Definition for api
+      - name: Create new ECS Task Definition for api
+        id: register-api-task
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
         run: |
-          aws ecs update-service --cluster my-app-cluster --service api --force-new-deployment
+          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition api | jq '.taskDefinition | del(.status, .taskDefinitionArn, .revision, .requiresAttributes, .registeredAt, .deregisteredAt)')
+          NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | jq --arg IMAGE_TAG "730335666258.dkr.ecr.us-east-1.amazonaws.com/api-api:${{ env.API_IMAGE_TAG }}" '.containerDefinitions[0].image = $IMAGE_TAG')
+          echo $NEW_TASK_DEFINITION > new-api-task-def.json
+          aws ecs register-task-definition --cli-input-json file://new-api-task-def.json
 
-      # Update ECS service for auth
-      - name: Update ECS service for auth
+      # Update ECS Task Definition for auth
+      - name: Create new ECS Task Definition for auth
+        id: register-auth-task
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
         run: |
-          aws ecs update-service --cluster my-app-cluster --service auth --force-new-deployment
+          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition auth | jq '.taskDefinition | del(.status, .taskDefinitionArn, .revision, .requiresAttributes, .registeredAt, .deregisteredAt)')
+          NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | jq --arg IMAGE_TAG "730335666258.dkr.ecr.us-east-1.amazonaws.com/api-auth:${{ env.AUTH_IMAGE_TAG }}" '.containerDefinitions[0].image = $IMAGE_TAG')
+          echo $NEW_TASK_DEFINITION > new-auth-task-def.json
+          aws ecs register-task-definition --cli-input-json file://new-auth-task-def.json
+
+      # Update ECS Service for api
+      - name: Update ECS Service for api
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          TASK_REVISION=$(aws ecs describe-task-definition --task-definition api | jq -r '.taskDefinition.revision')
+          aws ecs update-service --cluster my-app-cluster --service api --task-definition api:$TASK_REVISION --force-new-deployment
+
+      # Update ECS Service for auth
+      - name: Update ECS Service for auth
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          TASK_REVISION=$(aws ecs describe-task-definition --task-definition auth | jq -r '.taskDefinition.revision')
+          aws ecs update-service --cluster my-app-cluster --service auth --task-definition auth:$TASK_REVISION --force-new-deployment
