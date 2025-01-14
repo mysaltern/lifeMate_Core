@@ -20,21 +20,19 @@ export class AuthGuard implements CanActivate {
       const AUTH_URL = this.configService.get<string>('AUTH_URL');
       console.log(AUTH_URL);
       console.log('auth was<--')
+      
       const authServiceUrl = `${AUTH_URL}/auth/validate-token`;
       const response = await lastValueFrom(
         this.httpService.post(authServiceUrl, { token })
       );
-    
+      console.log(response)
+      
       // Attach user data to the request
       request.user = response.data.decoded;
       return true;
     } catch (error) {
 
       const AUTH_URL = this.configService.get<string>('AUTH_URL');
-      const authServiceUrl = `${AUTH_URL}/auth/validate-token`;
-      const response = await lastValueFrom(
-        this.httpService.post(authServiceUrl, { token })
-      );
       console.log('TEST AWS');
       console.log(AUTH_URL);
       throw new UnauthorizedException('Invalid or expired token');
