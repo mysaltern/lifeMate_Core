@@ -42,4 +42,4 @@ COPY --from=builder /usr/src/app/node_modules ./node_modules
 EXPOSE 3002
 
 # Start the application
-CMD ["node", "dist/apps/auth/main.js"]
+CMD ["node", "dist/apps/auth/src/main.js"]
