@@ -23,31 +23,39 @@ export class TtsService {
   }
 
 
-  async makeSound(inputText: string,userID: number): Promise<string> {
+  async makeSound(inputText: string, userID: number): Promise<string> {
     try {
+      console.log('tts called try');
+      console.log(inputText);
       const timestamp = Date.now();
-      const fileName = `./sounds/${userID}_${timestamp}.mp3`;
-      const _output = path.resolve(fileName); 
+      const soundsDir = path.resolve('./sounds'); // Ensure this is correctly resolved
+      const fileName = `${userID}_${timestamp}.mp3`;
+      const _output = path.join(soundsDir, fileName);
+  
+      // Ensure sounds directory exists
+      if (!fs.existsSync(soundsDir)) {
+        fs.mkdirSync(soundsDir, { recursive: true });
+      }
+  
       const inputString = String(inputText); // Explicitly convert to string
-
       const mp3 = await this.openai.audio.speech.create({
         model: 'tts-1',
         voice: 'onyx',
         input: inputString, // Use the converted string here
       });
-
-      if (fs.existsSync(_output)) {
-        fs.unlinkSync(_output);
-      }
-
+  
       const buffer = Buffer.from(await mp3.arrayBuffer());
       await fs.promises.writeFile(_output, buffer);
       console.log('Speech synthesis complete.');
-
-      return fileName; 
+  
+      return fileName; // Return only the file name or the relative path
     } catch (error) {
+      console.log('tts called catch');
+      console.log(inputText);
       console.log('Speech synthesis failed.');
       console.error(error);
+      throw error; // Re-throw the error to handle it at a higher level
     }
   }
+  
 }
