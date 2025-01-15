@@ -53,3 +53,20 @@ jobs:
           jq --arg IMAGE_TAG "730335666258.dkr.ecr.us-east-1.amazonaws.com/api-tts:${{ env.TTS_IMAGE_TAG }}" '.containerDefinitions[0].image = $IMAGE_TAG')
           echo $NEW_TASK_DEFINITION > new-tts-task-def.json
           aws ecs register-task-definition --cli-input-json file://new-tts-task-def.json
+
+
+
+        # Update ECS Service for tts
+      - name: Update ECS Service for tts
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          TASK_REVISION=$(aws ecs describe-task-definition --task-definition tts | jq -r '.taskDefinition.revision')
+          aws ecs update-service \
+            --cluster my-app-cluster \
+            --service tts \
+            --task-definition tts:${TASK_REVISION} \
+            --network-configuration "awsvpcConfiguration={subnets=[subnet-0e84ae40779095680],securityGroups=[sg-0271630958447aeae],assignPublicIp=ENABLED}" \
+            --force-new-deployment
