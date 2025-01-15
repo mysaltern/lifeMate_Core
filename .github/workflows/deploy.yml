@@ -24,44 +24,32 @@ jobs:
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 730335666258.dkr.ecr.us-east-1.amazonaws.com
 
 
-
-
-
-
-        # Build and push Docker image for CHATGPT
-      - name: Build and push Docker image for ChatGPT
+        # Build and push Docker image for TTS
+      - name: Build and push Docker image for TTS
         env:
           AWS_DEFAULT_REGION: us-east-1
         run: |
           IMAGE_TAG=$(date +%Y%m%d%H%M%S)
-          docker build -t api-chatgpt:${IMAGE_TAG} -f apps/chatgpt/Dockerfile .
-          docker tag api-chatgpt:${IMAGE_TAG} 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-chatgpt:${IMAGE_TAG}
-          docker push 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-chatgpt:${IMAGE_TAG}
-          echo "CHATGPT_IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
+          docker build -t api-tts:${IMAGE_TAG} -f apps/tts/Dockerfile .
+          docker tag api-tts:${IMAGE_TAG} 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-tts:${IMAGE_TAG}
+          docker push 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-tts:${IMAGE_TAG}
+          echo "TTS_IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
 
-      # Verify chatgpt image contents
-      - name: Verify Chatgpt image contents
+      # Verify tts image contents
+      - name: Verify Tts image contents
         run: |
-          docker run -t --rm 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-chatgpt:${{ env.CHATGPT_IMAGE_TAG }} sh -c "ls /usr/src/app/dist/apps"
+          docker run -t --rm 730335666258.dkr.ecr.us-east-1.amazonaws.com/api-tts:${{ env.TTS_IMAGE_TAG }} sh -c "ls /usr/src/app/dist/apps"
 
-      # Register new task definition for Chatgpt
-      - name: Register Task Definition for Chatgpt
+      # Register new task definition for Tts
+      - name: Register Task Definition for Tts
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-1
         run: |
-          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition chatgpt | \
+          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition tts | \
           jq '.taskDefinition | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .deregisteredAt, .registeredBy)')
           NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | \
-          jq --arg IMAGE_TAG "730335666258.dkr.ecr.us-east-1.amazonaws.com/api-chatgpt:${{ env.CHATGPT_IMAGE_TAG }}" '.containerDefinitions[0].image = $IMAGE_TAG')
-          echo $NEW_TASK_DEFINITION > new-chatgpt-task-def.json
-          aws ecs register-task-definition --cli-input-json file://new-chatgpt-task-def.json
-
-
-
-
-
-
-
- 
+          jq --arg IMAGE_TAG "730335666258.dkr.ecr.us-east-1.amazonaws.com/api-tts:${{ env.TTS_IMAGE_TAG }}" '.containerDefinitions[0].image = $IMAGE_TAG')
+          echo $NEW_TASK_DEFINITION > new-tts-task-def.json
+          aws ecs register-task-definition --cli-input-json file://new-tts-task-def.json
