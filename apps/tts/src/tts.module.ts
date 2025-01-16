@@ -18,7 +18,7 @@ import { TtsService } from './tts.service';
       isGlobal: true,
     }),
     ServeStaticModule.forRoot({
-      rootPath: getStaticFilePath(), // Dynamically determine the path
+      rootPath: resolveStaticFilePath(), // Dynamically resolve path without failing if it doesn't exist
       serveRoot: '/sounds',
     }),
   ],
@@ -28,21 +28,20 @@ import { TtsService } from './tts.service';
 export class TtsModule {}
 
 /**
- * Dynamically determine the static file path based on folder existence.
+ * Dynamically resolve the static file path, creating the folder if necessary.
  */
-function getStaticFilePath(): string {
+function resolveStaticFilePath(): string {
   const localPath = join(__dirname, '..', '..', '..', 'sounds'); // Localhost path
   const ecsPath = '/usr/src/app/sounds'; // ECS path
 
-  if (fs.existsSync(localPath)) {
-    console.log(`Using local path for static files: ${localPath}`);
-    return localPath;
+  const chosenPath = fs.existsSync(localPath) ? localPath : ecsPath;
+
+  // Ensure the folder exists, create it if not
+  if (!fs.existsSync(chosenPath)) {
+    console.log(`Static files path does not exist. Creating: ${chosenPath}`);
+    fs.mkdirSync(chosenPath, { recursive: true });
   }
 
-  if (fs.existsSync(ecsPath)) {
-    console.log(`Using ECS path for static files: ${ecsPath}`);
-    return ecsPath;
-  }
-
-  throw new Error('No valid static file path found. Ensure "sounds" directory exists.');
+  console.log(`Using static files path: ${chosenPath}`);
+  return chosenPath;
 }
