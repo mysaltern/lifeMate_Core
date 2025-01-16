@@ -9,53 +9,84 @@ import * as path from 'path';
 export class TtsService {
   private readonly apiKey: string;
   private readonly openai: OpenAI;
-  private readonly _output: string;
-
+  private readonly soundsDir: string;
 
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
-    this.apiKey = this.configService.get<string>('OPENAI_API_KEY'); 
+    this.apiKey = this.configService.get<string>('OPENAI_API_KEY');
     this.openai = new OpenAI({
       apiKey: this.apiKey,
     });
-  }
 
+    // Define the directory to store sound files
+    this.soundsDir = path.resolve('./sounds');
+
+    // Ensure the sounds directory exists
+    if (!fs.existsSync(this.soundsDir)) {
+      fs.mkdirSync(this.soundsDir, { recursive: true });
+    }
+
+    // Start periodic cleanup of old files
+    setInterval(() => this.cleanupOldFiles(), 60 * 60 * 1000); // Every 60 minutes
+  }
 
   async makeSound(inputText: string, userID: number): Promise<string> {
     try {
-      console.log('tts called try');
-      console.log(inputText);
+      console.log('TTS service called');
       const timestamp = Date.now();
-      const soundsDir = path.resolve('./sounds'); // Ensure this is correctly resolved
       const fileName = `${userID}_${timestamp}.mp3`;
-      const _output = path.join(soundsDir, fileName);
-  
-      // Ensure sounds directory exists
-      if (!fs.existsSync(soundsDir)) {
-        fs.mkdirSync(soundsDir, { recursive: true });
-      }
-  
-      const inputString = String(inputText); // Explicitly convert to string
+      const filePath = path.join(this.soundsDir, fileName);
+
+      const inputString = String(inputText);
       const mp3 = await this.openai.audio.speech.create({
         model: 'tts-1',
         voice: 'onyx',
-        input: inputString, // Use the converted string here
+        input: inputString,
       });
-  
+
       const buffer = Buffer.from(await mp3.arrayBuffer());
-      await fs.promises.writeFile(_output, buffer);
+      await fs.promises.writeFile(filePath, buffer);
       console.log('Speech synthesis complete.');
-  
-      return fileName; // Return only the file name or the relative path
+
+      return fileName;
     } catch (error) {
-      console.log('tts called catch');
-      console.log(inputText);
-      console.log('Speech synthesis failed.');
-      console.error(error);
-      throw error; // Re-throw the error to handle it at a higher level
+      console.error('Error during TTS generation:', error);
+      throw error;
     }
   }
-  
+
+  private cleanupOldFiles(): void {
+    const now = Date.now();
+    const sixtyMinutesAgo = now - 60 * 60 * 1000; // 60 minutes ago
+
+    fs.readdir(this.soundsDir, (err, files) => {
+      if (err) {
+        console.error('Error reading directory:', err);
+        return;
+      }
+
+      files.forEach((file) => {
+        const filePath = path.join(this.soundsDir, file);
+        fs.stat(filePath, (err, stats) => {
+          if (err) {
+            console.error('Error getting file stats:', err);
+            return;
+          }
+
+          // Delete files older than 60 minutes
+          if (stats.mtimeMs < sixtyMinutesAgo) {
+            fs.unlink(filePath, (err) => {
+              if (err) {
+                console.error('Error deleting file:', err);
+              } else {
+                console.log(`Deleted old file: ${file}`);
+              }
+            });
+          }
+        });
+      });
+    });
+  }
 }
