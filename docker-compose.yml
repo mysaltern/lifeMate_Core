@@ -48,6 +48,22 @@ services:
       NODE_ENV: ${NODE_ENV:-development}
       CONFIG_ENV_FILE: ./apps/tts/.env.${NODE_ENV:-development}
 
+  stt:
+    build:
+      context: .
+      dockerfile: ./apps/stt/Dockerfile
+      target: development
+    command: npm run start:dev -- stt
+    ports:
+      - "3004:3004"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    container_name: stt
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      CONFIG_ENV_FILE: ./apps/stt/.env.${NODE_ENV:-development}
+
   chatgpt:
     build:
       context: .

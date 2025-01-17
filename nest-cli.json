@@ -54,6 +54,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/tts/tsconfig.app.json"
       }
+    },
+    "stt": {
+      "type": "application",
+      "root": "apps/stt",
+      "entryFile": "main",
+      "sourceRoot": "apps/stt/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/stt/tsconfig.app.json"
+      }
     }
   }
 }
