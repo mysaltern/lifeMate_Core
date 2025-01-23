@@ -29,7 +29,7 @@ export class UserService {
         message: 'User successfully registered',
       };
     } catch (error) {
-      if (error.code === '23505') {
+      if ((error as any).code === '23505') {
         // Unique constraint violation (e.g., duplicate email)
         return {
           status: 'error',

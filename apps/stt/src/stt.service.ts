@@ -12,9 +12,9 @@ export class SttService {
   constructor() {
     console.log(`AWS_ACCESS_KEY_ID: ${process.env.AWS_ACCESS_KEY_ID}`);
     this.transcribeClient = new TranscribeStreamingClient({
-      region: 'us-east-1', // Replace with your AWS region
+      region: 'us-east-1',
       credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID, // Use environment variables for security
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
       },
     });
@@ -24,18 +24,17 @@ export class SttService {
     console.log(`Processing file for user: ${userID}`);
     console.log(`File received: ${file.originalname}`);
 
-    // Open the audio file as a stream with a chunk size of 3.2 KB
-    const audioStream = fs.createReadStream(file.path, { highWaterMark: 3200 }); // 3.2 KB chunks
+    const audioStream = fs.createReadStream(file.path, { highWaterMark: 3200 });
 
     const command = new StartStreamTranscriptionCommand({
-      LanguageCode: 'en-US', // Update with the appropriate language code
-      MediaSampleRateHertz: 16000, // Update with the audio sample rate
-      MediaEncoding: 'pcm', // AWS Transcribe requires raw PCM data
-      AudioStream: this.audioStreamGenerator(audioStream), // Stream generator
+      LanguageCode: 'en-US',
+      MediaSampleRateHertz: 16000,
+      MediaEncoding: 'pcm',
+      AudioStream: this.audioStreamGenerator(audioStream),
     });
 
-    const response = await this.transcribeClient.send(command);
     let transcription = '';
+    const response = await this.transcribeClient.send(command);
 
     try {
       for await (const event of response.TranscriptResultStream) {
@@ -53,15 +52,11 @@ export class SttService {
       throw error;
     }
 
-    console.log(`Final Transcription: ${transcription.trim()}`);
     return transcription.trim();
   }
 
-  private async *audioStreamGenerator(
-    audioStream: fs.ReadStream,
-  ): AsyncGenerator<{ AudioEvent: { AudioChunk: Buffer } }> {
+  private async *audioStreamGenerator(audioStream: fs.ReadStream) {
     for await (const chunk of audioStream) {
-      console.log(`Sending chunk of size: ${chunk.length} bytes`);
       yield { AudioEvent: { AudioChunk: chunk } };
     }
   }

@@ -12,7 +12,7 @@ export class SttController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads', // Directory to save uploaded files
+        destination: './uploads',
         filename: (req, file, callback) => {
           const uniqueName = `${Date.now()}${extname(file.originalname)}`;
           callback(null, uniqueName);
@@ -21,7 +21,7 @@ export class SttController {
     }),
   )
   async process(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File, // Correct type
     @Body('userID') userID: number,
   ): Promise<string> {
     return await this.sttService.makeText(file, userID);

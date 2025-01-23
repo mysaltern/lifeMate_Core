@@ -21,6 +21,7 @@
     "migration:run": "npx ts-node -r tsconfig-paths/register node_modules/typeorm/cli.js migration:run -d libs/common/src/database/data-source.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-transcribe-streaming": "^3.733.0",
     "@nestjs/axios": "^3.1.2",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.3.0",
@@ -46,6 +47,7 @@
     "@nestjs/testing": "^10.0.0",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.2",
+    "@types/multer": "^1.4.12",
     "@types/node": "^20.3.1",
     "@types/serve-static": "^1.15.7",
     "@types/supertest": "^6.0.0",
