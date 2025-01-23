@@ -4,10 +4,12 @@ import {
   StartStreamTranscriptionCommand,
 } from '@aws-sdk/client-transcribe-streaming';
 import * as fs from 'fs';
+import * as util from 'util';
 
 @Injectable()
 export class SttService {
   private readonly transcribeClient: TranscribeStreamingClient;
+  private readonly unlinkFile = util.promisify(fs.unlink); // Promisify fs.unlink for async/await
 
   constructor() {
     console.log(`AWS_ACCESS_KEY_ID: ${process.env.AWS_ACCESS_KEY_ID}`);
@@ -50,6 +52,14 @@ export class SttService {
     } catch (error) {
       console.error('Error processing transcription:', error);
       throw error;
+    } finally {
+      // Delete the chunk file after transcription is complete
+      try {
+        await this.unlinkFile(file.path);
+        console.log(`Deleted file: ${file.path}`);
+      } catch (unlinkError) {
+        console.error(`Failed to delete file: ${file.path}`, unlinkError);
+      }
     }
 
     return transcription.trim();
