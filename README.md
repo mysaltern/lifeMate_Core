@@ -157,12 +157,6 @@ The project has been fully Dockerized for seamless setup and operation. Below ar
 
 ---
 
-## Contribution
-
-Feel free to contribute to this project by submitting issues, feature requests, or pull requests. All contributions are welcome!
-
----
-
 ## License
 
 Copyright (c) 2025 Mohammad  
