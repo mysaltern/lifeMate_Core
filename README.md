@@ -126,6 +126,7 @@ The project has been fully Dockerized for seamless setup and operation. Below ar
 - **ChatGPT Service**: Runs on port `3001`.
 - **Auth Service**: Runs on port `3002`.
 - **TTS Service**: Runs on port `3003`.
+- **STT Service**: Runs on port `3004`.
 - **PostgreSQL Database**: Runs on port `5433` and stores application data.
 
 ### Example Commands
