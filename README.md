@@ -165,7 +165,9 @@ Feel free to contribute to this project by submitting issues, feature requests, 
 
 ## License
 
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for more details.
+
+This repository is for personal progress tracking only. 
+No one is permitted to use, copy, modify, or distribute this code without explicit written permission.
 
 ---
 
