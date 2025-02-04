@@ -49,7 +49,12 @@ This project is currently **under development** and forms the backbone of the Di
   ```bash
   npm run start:dev tts
   ```
-
+### 5. **STT (Speech-to-Text) Service**
+- Provides speech-to-text capabilities for the Digital Doll.
+- To run:
+  ```bash
+  npm run start:dev stt
+  ```
 ---
 
 ## Prerequisites
