@@ -173,7 +173,3 @@ No one is permitted to use, copy, modify, or distribute this code without explic
 
 ### Notes
 This README will evolve as the project matures. Stay tuned for updates! 🚀
-
----
-
-This update provides clear instructions on how to set `NODE_ENV` for different environments and operating systems. It's now ready for developers to follow when starting the application locally!
