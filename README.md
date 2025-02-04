@@ -165,10 +165,10 @@ Feel free to contribute to this project by submitting issues, feature requests, 
 
 ## License
 
-
+Copyright (c) 2025 Mohammad  
+All rights reserved.  
 This repository is for personal progress tracking only. 
 No one is permitted to use, copy, modify, or distribute this code without explicit written permission.
-
 ---
 
 ### Notes
