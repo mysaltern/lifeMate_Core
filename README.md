@@ -13,7 +13,6 @@ This project is currently **under development** and forms the backbone of the Di
 ## Features
 
 - **Microservices Architecture**: Enables modular and independent development of core components.
-- **Kafka Integration**: Facilitates communication between services using a reliable message broker.
 - **Scalability**: Built with scalability in mind to handle increasing user demands.
 - **NestJS Framework**: Provides a robust and maintainable foundation for backend services.
 - **Dockerized Environment**: Simplifies deployment with pre-configured Docker containers.
