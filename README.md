@@ -1,4 +1,4 @@
-# Digital Doll Core (NestJS Project)
+# Digital Doll Core (Node-NestJS Project)
 
 This repository serves as the core backend for a **Digital Doll** platform, built using the **NestJS** framework. The project is designed to operate as a **microservice-based architecture**, providing modularity, scalability, and flexibility for future enhancements.
 
